@@ -1,4 +1,3 @@
 # PenguinPicker
-
+Name: Parlea Marian-Alexandru 3A1
 # References
-- Penguin Model: https://cults3d.com/en/3d-model/art/pinguino-cartoon
