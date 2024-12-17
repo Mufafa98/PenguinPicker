@@ -5,7 +5,8 @@ import sys
 
 from colortag import c
 
-HELP_MESSAGE = c('''
+HELP_MESSAGE = c(
+'''
 <About: blue;bold>
 This is a simple runner script that helps running the server or the client
 <Usage: blue;bold>
@@ -14,7 +15,8 @@ This is a simple runner script that helps running the server or the client
     [APPLICATION]:
         -c --client: run the client
         -s --server: run the server
-            ''')
+'''
+)
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:

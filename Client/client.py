@@ -2,6 +2,7 @@ import socket
 from colortag import cprint
 from Utils import Message, Protocol, SERVER_IP, SERVER_PORT
 
+from .gui import start_gui
 
 def run():
     # Create a socket object
@@ -23,8 +24,9 @@ def run():
         response = client_socket.recv(1024)
         message = Message.from_bytes(response).data
         cprint(f"Received from server: {message}")
-        while True:
-            pass
+        start_gui()
+        # while True:
+        #     pass
     except KeyboardInterrupt:
         cprint("Shutting down client...")
     except Exception as e:

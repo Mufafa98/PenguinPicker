@@ -23,6 +23,7 @@ def handle_client(client_socket: socket.socket):
 
 def run():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server.bind((SERVER_IP, SERVER_PORT))
     server.listen()
     cprint(f"[<Success: green;bold>]: Server listening on port {SERVER_PORT}")
