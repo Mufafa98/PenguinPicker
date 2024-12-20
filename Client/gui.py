@@ -1,13 +1,8 @@
 import pygame
 import sys
-
-
 from .penguin_engine import *
-import random
-
-BACKGROUND_COLOR = (123, 123, 123)
-SCREEN_SIZE = (1000, 800)
-FPS = 60
+from .gui_params import *
+from .click_dispatcher import ClickDispatcher
 
 def start_gui():
     
@@ -19,8 +14,9 @@ def start_gui():
 
     # Clock for controlling frame rate
     clock = pygame.time.Clock()
-
+    dispatcher = ClickDispatcher()
     engine = Engine()
+    dispatcher.register_objects(engine.used_ids(), engine)
 
     # Main loop
     running = True
@@ -30,12 +26,18 @@ def start_gui():
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
-                print(f"Mouse clicked at ({x}, {y})")
+                dispatcher.dispatch_click(x, y)
 
         # Clear screen
         screen.fill(BACKGROUND_COLOR)
 
         engine.draw(screen)
+
+        # # Draw grid
+        # for x in range(0, SCREEN_SIZE[0], 50):
+        #     pygame.draw.line(screen, (255, 0, 0), (x, 0), (x, SCREEN_SIZE[1]))
+        # for y in range(0, SCREEN_SIZE[1], 50):
+        #     pygame.draw.line(screen, (255, 0, 0), (0, y), (SCREEN_SIZE[0], y))
         
         # Update display
         pygame.display.flip()

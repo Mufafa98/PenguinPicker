@@ -2,7 +2,7 @@ import pygame
 import sys
 
 
-from .penguin_engine import *
+from ..penguin_engine import *
 import random
 
 BACKGROUND_COLOR = (123, 123, 123)
