@@ -5,13 +5,14 @@ import sys
 import time
 
 from .gui_params import *
+import os
 
 class Tile:
-    EMPTY = 0b00
-    ICE = 0b10
-    CRACKED_ICE = 0b100
-    FINISH = 0b1000
-    PENGUIN = 0b1
+    EMPTY               = 0b0000000
+    PENGUIN             = 0b0000001
+    ICE                 = 0b0000010
+    CRACKED_ICE         = 0b0000100
+    FINISH              = 0b0001000
 
 class Turn:
     PENGUIN = 0b0
@@ -32,7 +33,7 @@ HEX_COORDS_COEF = [
 ]
 
 
-def create_board(lines: int, cols: int, crack_percent) -> list:
+def create_board(lines: int, cols: int, crack_percent: float, penguin_pos: tuple = None) -> list:
     board = []
     for line in range(lines):
         temp_line = []
@@ -48,10 +49,13 @@ def create_board(lines: int, cols: int, crack_percent) -> list:
             else:
                 temp_line.append(Tile.EMPTY)
         board.append(temp_line)
-    mid_pos = (len(board[0]) // 2, len(board) // 2)
-    if board[mid_pos[1]][mid_pos[0]] & Tile.EMPTY == 0:
-        mid_pos = (mid_pos[0] - 1, mid_pos[1])
-    board[mid_pos[1]][mid_pos[0]] = Tile.ICE | Tile.PENGUIN
+    if penguin_pos is None:
+        mid_pos = (len(board[0]) // 2, len(board) // 2)
+        if board[mid_pos[1]][mid_pos[0]] == Tile.EMPTY:
+            mid_pos = (mid_pos[0] - 1, mid_pos[1])
+        board[mid_pos[1]][mid_pos[0]] = Tile.ICE | Tile.PENGUIN
+    else:
+        board[penguin_pos[1]][penguin_pos[0]] = Tile.ICE | Tile.PENGUIN
     return board
 
 class Hexagon:
@@ -108,40 +112,78 @@ class Hexagon:
     def __repr__(self):
         return self.__str__()
 
+def center_board(board_size: tuple, hex_size: int) -> tuple:
+    board_width = board_size[0] * hex_size
+    board_height = (((board_size[1] + 1 )/ 2) * hex_size + 
+                    board_size[1] / 2 * hex_size / 2)
+    return ((SCREEN_SIZE[0] - board_width) / 2, 
+            (SCREEN_SIZE[1] - board_height) / 2)
+def snow_texture(board: list, x: int, y: int) -> pygame.Surface:
+        global TEXTURES
+        def get_board_tile(board: list, x: int, y: int) -> int:
+            try:
+                if board[y][x] & Tile.FINISH != 0:
+                    return Tile.EMPTY
+                elif board[y][x] & Tile.CRACKED_ICE != 0:
+                    return Tile.ICE
+                elif board[y][x] & Tile.ICE != 0:
+                    return Tile.ICE
+                return board[y][x]
+            except IndexError:
+                return Tile.EMPTY
+        neighbors = [
+            get_board_tile(board, x - 1, y - 1),
+            get_board_tile(board, x + 1, y - 1),
+            get_board_tile(board, x + 2, y),
+            get_board_tile(board, x + 1, y + 1),
+            get_board_tile(board, x - 1, y + 1),
+            get_board_tile(board, x - 2, y),
+        ]
+        if neighbors[0] == Tile.ICE and neighbors[1] == Tile.ICE:
+            return TEXTURES['SNOW_BOTTOM']
+        elif neighbors[0] == Tile.ICE and neighbors[4] == Tile.ICE:
+            return TEXTURES['SNOW_LEFT']
+        elif neighbors[5] == Tile.ICE:
+            return TEXTURES['SNOW_SLEFT']
+        elif neighbors[0] == Tile.ICE:
+            return TEXTURES['SNOW_BLEFT']
+        elif neighbors[1] == Tile.ICE and neighbors[3] == Tile.ICE:
+            return TEXTURES['SNOW_RIGHT']
+        elif neighbors[2] == Tile.ICE:
+            return TEXTURES['SNOW_SRIGHT']
+        elif neighbors[1] == Tile.ICE:
+            return TEXTURES['SNOW_BRIGHT']
+        elif neighbors[3] == Tile.ICE and neighbors[4] == Tile.ICE:
+            return TEXTURES['SNOW_TOP']
+        elif neighbors[3] == Tile.ICE:
+            return TEXTURES['SNOW_TRIGHT']
+        elif neighbors[4] == Tile.ICE:
+            return TEXTURES['SNOW_TLEFT']
+        return None
+
+
+
 class Engine(Supervisor):
     def __init__(self, board_size: tuple = (16, 15), hex_size: int = 64):
         global OBJECT_ID
         self.board = create_board(board_size[1], board_size[0], 0.2)
         self.hex_size = hex_size
-        self.textures = dict()
-        texture = pygame.image.load('./assests/32x32/ice/ice_1_2.png')
-        texture = pygame.transform.scale(texture, (self.hex_size, self.hex_size))
-        self.textures[Tile.ICE] = texture
-        texture = pygame.image.load('./assests/32x32/ice/hole_full.png')
-        texture = pygame.transform.scale(texture, (self.hex_size, self.hex_size))
-        self.textures[Tile.CRACKED_ICE] = texture
-        texture = pygame.image.load('./assests/32x32/penguin/penguin.png')
-        texture = pygame.transform.scale(texture, (self.hex_size, self.hex_size))
-        self.textures[Tile.PENGUIN] = texture
-        board_width = board_size[0] * hex_size
-        board_height = (((board_size[1] + 1 )/ 2) * hex_size + 
-                        board_size[1] / 2 * hex_size / 2)
-        self.platform_start = ((SCREEN_SIZE[0] - board_width) / 2, 
-                               (SCREEN_SIZE[1] - board_height) / 2)
+        # board_width = board_size[0] * hex_size
+        # board_height = (((board_size[1] + 1 )/ 2) * hex_size + 
+        #                 board_size[1] / 2 * hex_size / 2)
+        # self.platform_start = ((SCREEN_SIZE[0] - board_width) / 2, 
+        #                        (SCREEN_SIZE[1] - board_height) / 2)
+        self.platform_start = center_board(board_size, hex_size)
         self.hex_objects = dict()
         for y, row in enumerate(self.board):
             for x, tile in enumerate(row):
                 if tile & Tile.ICE != 0 or tile & Tile.CRACKED_ICE != 0:
-                    color = 0x4287f5
                     if tile & Tile.PENGUIN != 0:
                         self.penguin_pos = (x, y)
                         self.penguin_id = OBJECT_ID
-                        color = 0xFFFFFF - color
-                    if tile & Tile.FINISH != 0:
-                        color = 0x00FA00
                     self.hex_objects[OBJECT_ID] = Hexagon(
                         self.platform_start, x, y, 
-                        hex_size, OBJECT_ID, color)
+                        hex_size, OBJECT_ID)
                     OBJECT_ID += 1
         self.turn = Turn.PENGUIN
         self.game_status = GameStatus.RUNNING
@@ -204,15 +246,38 @@ class Engine(Supervisor):
     def used_ids(self) -> list:
         return list(self.hex_objects.keys())
 
+    
+    def penguin_texture(self) -> pygame.Surface:
+        if self.game_status == GameStatus.PENGUIN_WON:
+            return self.textures['PENGUIN']
+        elif self.legal_for_penguin():
+            return self.textures['PENGUIN_SCARED']
+        return self.textures['PENGUIN_SAD']
+
     def draw(self, screen: pygame.Surface):
         for hexagon in self.hex_objects.values():
             if self.board[hexagon.y][hexagon.x] & Tile.CRACKED_ICE != 0:
-                screen.blit(self.textures[Tile.CRACKED_ICE], (hexagon.points[0][0] - self.hex_size / 2, hexagon.points[0][1]))
+                top_left_neigh = self.board[hexagon.y - 1][hexagon.x - 1]
+                top_left_neigh = top_left_neigh & Tile.ICE 
+                top_right_neigh = self.board[hexagon.y - 1][hexagon.x + 1]
+                top_right_neigh = top_right_neigh & Tile.ICE 
+                if top_left_neigh and top_right_neigh:
+                    screen.blit(self.textures['HOLE_HALF'], (hexagon.points[0][0] - self.hex_size / 2, hexagon.points[0][1]))
+                elif top_left_neigh:
+                    screen.blit(self.textures['HOLE_HALF_LEFT'], (hexagon.points[0][0] - self.hex_size / 2, hexagon.points[0][1]))
+                elif top_right_neigh:
+                    screen.blit(self.textures['HOLE_HALF_RIGHT'], (hexagon.points[0][0] - self.hex_size / 2, hexagon.points[0][1]))
+                else:
+                    screen.blit(self.textures['HOLE_FULL'], (hexagon.points[0][0] - self.hex_size / 2, hexagon.points[0][1]))
             elif (self.board[hexagon.y][hexagon.x] & Tile.ICE != 0 and 
                   self.board[hexagon.y][hexagon.x] & Tile.FINISH == 0):
-                screen.blit(self.textures[Tile.ICE], (hexagon.points[0][0] - self.hex_size / 2, hexagon.points[0][1]))
+                screen.blit(self.textures['ICE_BORDER'], (hexagon.points[0][0] - self.hex_size / 2, hexagon.points[0][1]))
+            elif self.board[hexagon.y][hexagon.x] & Tile.FINISH != 0:
+                texture = snow_texture(self.board, hexagon.x, hexagon.y)
+                if texture is not None:
+                    screen.blit(texture, (hexagon.points[0][0] - self.hex_size / 2, hexagon.points[0][1]))  
             if hexagon.obj_id == self.penguin_id:
-                screen.blit(self.textures[Tile.PENGUIN], (hexagon.points[0][0] - self.hex_size / 2, hexagon.points[0][1] - self.hex_size * 0.25))
+                screen.blit(self.penguin_texture(), (hexagon.points[0][0] - self.hex_size / 2, hexagon.points[0][1] - self.hex_size * 0.25))
 
         font = pygame.font.Font(None, 36)
         if self.game_status & GameStatus.PENGUIN_WON != 0:
