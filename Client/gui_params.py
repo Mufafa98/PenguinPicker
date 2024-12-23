@@ -14,6 +14,7 @@ index_buffer = [
 ]
 
 TEXTURES = dict()
+MAIN_FONT = None
 
 def load_assets(hex_size: int) -> dict:
         global TEXTURES

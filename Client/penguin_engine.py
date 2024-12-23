@@ -13,6 +13,7 @@ class Tile:
     ICE                 = 0b0000010
     CRACKED_ICE         = 0b0000100
     FINISH              = 0b0001000
+    ICON_ONLINE         = 0b0010000
 
 class Turn:
     PENGUIN = 0b0
@@ -33,7 +34,12 @@ HEX_COORDS_COEF = [
 ]
 
 
-def create_board(lines: int, cols: int, crack_percent: float, penguin_pos: tuple = None) -> list:
+def create_board(
+        lines: int, 
+        cols: int, 
+        crack_percent: float, 
+        penguin_pos: tuple = None, 
+        with_penguin: bool = True) -> list:
     board = []
     for line in range(lines):
         temp_line = []
@@ -49,13 +55,14 @@ def create_board(lines: int, cols: int, crack_percent: float, penguin_pos: tuple
             else:
                 temp_line.append(Tile.EMPTY)
         board.append(temp_line)
-    if penguin_pos is None:
-        mid_pos = (len(board[0]) // 2, len(board) // 2)
-        if board[mid_pos[1]][mid_pos[0]] == Tile.EMPTY:
-            mid_pos = (mid_pos[0] - 1, mid_pos[1])
-        board[mid_pos[1]][mid_pos[0]] = Tile.ICE | Tile.PENGUIN
-    else:
-        board[penguin_pos[1]][penguin_pos[0]] = Tile.ICE | Tile.PENGUIN
+    if with_penguin:
+        if penguin_pos is None:
+            mid_pos = (len(board[0]) // 2, len(board) // 2)
+            if board[mid_pos[1]][mid_pos[0]] == Tile.EMPTY:
+                mid_pos = (mid_pos[0] - 1, mid_pos[1])
+            board[mid_pos[1]][mid_pos[0]] = Tile.ICE | Tile.PENGUIN
+        else:
+            board[penguin_pos[1]][penguin_pos[0]] = Tile.ICE | Tile.PENGUIN
     return board
 
 class Hexagon:

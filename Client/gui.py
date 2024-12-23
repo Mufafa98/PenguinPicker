@@ -18,6 +18,8 @@ def start_gui():
 
     pygame.init()
 
+    MAIN_FONT = pygame.font.Font("./assests/fonts/04B_30__.TTF", 36)
+
     # Initialize screen
     screen = pygame.display.set_mode(SCREEN_SIZE)
     pygame.display.set_caption("Penguin Picker")
@@ -43,6 +45,10 @@ def start_gui():
 
         # engine.draw(screen)
         menu.draw(screen)
+
+        #import font and write something
+        # text = MAIN_FONT.render("Online Local", True, (0, 0, 0))
+        # screen.blit(text, (10, 10))
 
         # # Draw grid
         # for x in range(0, SCREEN_SIZE[0], 50):
