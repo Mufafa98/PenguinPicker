@@ -1,12 +1,24 @@
 import pygame
 import sys
 from .penguin_engine import *
+from .menu import *
 from .gui_params import *
 from .click_dispatcher import ClickDispatcher
 
 def start_gui():
     
+    dispatcher = ClickDispatcher()
+
+    menu = Menu()
+    dispatcher.register_objects(menu.used_ids(), menu)
+    # engine = Engine()
+    # dispatcher.register_objects(engine.used_ids(), engine)
+    
+
+
     pygame.init()
+
+    MAIN_FONT = pygame.font.Font("./assests/fonts/04B_30__.TTF", 36)
 
     # Initialize screen
     screen = pygame.display.set_mode(SCREEN_SIZE)
@@ -14,9 +26,6 @@ def start_gui():
 
     # Clock for controlling frame rate
     clock = pygame.time.Clock()
-    dispatcher = ClickDispatcher()
-    engine = Engine()
-    dispatcher.register_objects(engine.used_ids(), engine)
 
     # Main loop
     running = True
@@ -27,11 +36,19 @@ def start_gui():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
                 dispatcher.dispatch_click(x, y)
+            if event.type == pygame.KEYDOWN:
+                key = event.key
+                menu.handle_key(key)
 
         # Clear screen
         screen.fill(BACKGROUND_COLOR)
 
-        engine.draw(screen)
+        # engine.draw(screen)
+        menu.draw(screen)
+
+        #import font and write something
+        # text = MAIN_FONT.render("Online Local", True, (0, 0, 0))
+        # screen.blit(text, (10, 10))
 
         # # Draw grid
         # for x in range(0, SCREEN_SIZE[0], 50):
