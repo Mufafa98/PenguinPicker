@@ -6,6 +6,11 @@ class Protocol(enum.Enum):
     PONG = 1
     EXIT = 2
     ID = 3
+    START = 4
+    WIN = 5
+    LOSE = 6
+    PENGUIN = 7
+    WALL = 8
 
 
 class Message:

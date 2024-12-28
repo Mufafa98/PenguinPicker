@@ -1,24 +1,22 @@
 import pygame
 import sys
+import socket
 from .penguin_engine import *
 from .menu import *
 from .gui_params import *
 from .click_dispatcher import ClickDispatcher
 
-def start_gui():
-    
+def start_gui(client_socket: socket.socket):
+    global game_state, assests
+
     dispatcher = ClickDispatcher()
 
-    menu = Menu()
+    menu = Menu(client_socket)
     dispatcher.register_objects(menu.used_ids(), menu)
-    # engine = Engine()
-    # dispatcher.register_objects(engine.used_ids(), engine)
-    
-
+    engine = None
 
     pygame.init()
 
-    MAIN_FONT = pygame.font.Font("./assests/fonts/04B_30__.TTF", 36)
 
     # Initialize screen
     screen = pygame.display.set_mode(SCREEN_SIZE)
@@ -26,6 +24,11 @@ def start_gui():
 
     # Clock for controlling frame rate
     clock = pygame.time.Clock()
+
+    # game_state.engine_reset = True
+    # game_state.game_type = 0
+    # game_state.seed = 0
+    # game_state.running = True
 
     # Main loop
     running = True
@@ -36,29 +39,42 @@ def start_gui():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
                 dispatcher.dispatch_click(x, y)
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN and not game_state.running:
                 key = event.key
                 menu.handle_key(key)
+
+        if game_state.engine_reset:
+            print("Resetting engine")
+            dispatcher.restart()
+            engine = Engine(
+                game_state.game_type, 
+                game_state.seed, 
+                client_socket=client_socket,
+                allow_only=game_state.game_turn,
+                player_1=game_state.player_1,
+                player_2=game_state.player_2
+                )
+            dispatcher.register_objects(engine.used_ids(), engine)
+            game_state.engine_reset = False
+        if game_state.menu_reset:
+            print("Resetting menu")
+            dispatcher.restart()
+            menu = Menu(client_socket)
+            dispatcher.register_objects(menu.used_ids(), menu)
+            game_state.menu_reset = False
 
         # Clear screen
         screen.fill(BACKGROUND_COLOR)
 
-        # engine.draw(screen)
-        menu.draw(screen)
-
-        #import font and write something
-        # text = MAIN_FONT.render("Online Local", True, (0, 0, 0))
-        # screen.blit(text, (10, 10))
-
-        # # Draw grid
-        # for x in range(0, SCREEN_SIZE[0], 50):
-        #     pygame.draw.line(screen, (255, 0, 0), (x, 0), (x, SCREEN_SIZE[1]))
-        # for y in range(0, SCREEN_SIZE[1], 50):
-        #     pygame.draw.line(screen, (255, 0, 0), (0, y), (SCREEN_SIZE[0], y))
+        if game_state.running:
+            engine.draw(screen)
+        else:
+            menu.draw(screen)
         
         # Update display
         pygame.display.flip()
         clock.tick(FPS)
 
+    client_socket.sendall(Message(Protocol.EXIT, "").to_bytes())
     pygame.quit()
     sys.exit()

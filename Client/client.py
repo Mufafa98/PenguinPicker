@@ -24,7 +24,7 @@ def run():
         response = client_socket.recv(1024)
         message = Message.from_bytes(response).data
         cprint(f"Received from server: {message}")
-        start_gui()
+        start_gui(client_socket)
         # while True:
         #     pass
     except KeyboardInterrupt:
