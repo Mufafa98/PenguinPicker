@@ -16,6 +16,7 @@ This is a simple runner script that helps running the server or the client
         -s --server: run the server
 ''')
 
+
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("Insufficient arguments provided. Use -h or --help for help")
