@@ -12,7 +12,6 @@ moves to the server.
 
 import pygame
 import socket
-
 from Utils.protocol import Protocol, Message
 
 from .gui_params import Supervisor, index_buffer, assets, game_state
@@ -22,7 +21,7 @@ from .hexagon import Hexagon, Tile
 from .hex_utils import create_board, snow_texture, center_board, hole_texture
 from .text_field import TextField, TextAlign
 from .button import Button
-
+from .bot import difficulty, PenguinBot, CrackerBot
 
 class Turn:
     """
@@ -79,7 +78,9 @@ class Engine(Supervisor):
     - `player_1`: The player 1 text field.
     - `player_2`: The player 2 text field.
     - `leave_button`: The leave button.
-
+    - `bot_penguin`: The penguin bot.
+    - `bot_cracker`: The cracker bot.
+    - `counter`: The counter for the bot moves.
     """
     def __init__(self, game_type: GameType,
                  seed: int, board_size: tuple = (18, 15), hex_size: int = 64,
@@ -87,6 +88,7 @@ class Engine(Supervisor):
                  player_1: str = "Anonymous", player_2: str = "Anonymous"):
         global index_buffer
         global assets
+        global game_state
         global TILE_SIZE, SCREEN_SIZE
         self.allow_only = allow_only
         self.socket = client_socket
@@ -140,6 +142,9 @@ class Engine(Supervisor):
                 assets.textures['ICON_WIN_PLAYER']
             ]
         )
+        self.bot_penguin = PenguinBot(difficulty(game_state.game_difficulty))
+        self.bot_cracker = CrackerBot(difficulty(game_state.game_difficulty))
+        self.counter = 0
 
     def handle_click(self, x: int, y: int, obj_id: int):
         """
@@ -151,19 +156,22 @@ class Engine(Supervisor):
         - `obj_id`: The id of the object clicked.
         """
         global game_state
+        global index_buffer
         if obj_id in self.hex_objects:
             if self.game_status == GameStatus.RUNNING:
                 if self.allow_only is None or self.allow_only == self.turn:
                     if self.turn == Turn.PENGUIN:
                         if self.move_penguin(x, y, obj_id):
                             # move was successful
-                            message = Message(Protocol.PENGUIN, f"{x} {y}")
-                            self.socket.sendall(message.to_bytes())
+                            if self.game_type == GameType.ONLINE:
+                                message = Message(Protocol.PENGUIN, f"{x} {y}")
+                                self.socket.sendall(message.to_bytes())
                     elif self.turn == Turn.WALL:
                         if self.place_wall(x, y, obj_id):
                             # wall was placed
-                            message = Message(Protocol.WALL, f"{x} {y}")
-                            self.socket.sendall(message.to_bytes())
+                            if self.game_type == GameType.ONLINE:
+                                message = Message(Protocol.WALL, f"{x} {y}")
+                                self.socket.sendall(message.to_bytes())
         elif obj_id == self.leave_button.button_id:
             print("Leave button clicked")
             game_state.running = False
@@ -231,7 +239,8 @@ class Engine(Supervisor):
             return False
         if abs(penguin_obj.x - curr_x) > 2 or abs(penguin_obj.y - curr_y) > 1:
             return False
-
+        if penguin_obj.x == curr_x and penguin_obj.y == curr_y:
+            return False
         aux = penguin_obj.color
         penguin_obj.color = current_obj.color
         current_obj.color = aux
@@ -300,21 +309,44 @@ class Engine(Supervisor):
         - `screen`: The screen to draw on.
         """
         global assets
-        try:
-            # Set up a non-blocking socket to recieve the moves
-            # that were made by the other player
-            data = self.socket.recv(1024, socket.MSG_DONTWAIT)
-            if data:
-                message = Message.from_bytes(data)
-                x, y = message.data.split()
-                x = int(x)
-                y = int(y)
-                if message.protocol == Protocol.PENGUIN:
-                    self.move_penguin(x, y, index_buffer.buffer[y][x])
-                elif message.protocol == Protocol.WALL:
-                    self.place_wall(x, y, index_buffer.buffer[y][x])
-        except BlockingIOError:
-            pass
+        if self.game_type == GameType.ONLINE:
+            try:
+                # Set up a non-blocking socket to recieve the moves
+                # that were made by the other player
+                data = self.socket.recv(1024, socket.MSG_DONTWAIT)
+                if data:
+                    message = Message.from_bytes(data)
+                    x, y = message.data.split()
+                    x = int(x)
+                    y = int(y)
+                    if message.protocol == Protocol.PENGUIN:
+                        self.move_penguin(x, y, index_buffer.buffer[y][x])
+                    elif message.protocol == Protocol.WALL:
+                        self.place_wall(x, y, index_buffer.buffer[y][x])
+            except BlockingIOError:
+                pass
+        elif self.counter % 20 == 0:
+            # print(1)
+            if self.allow_only is Turn.PENGUIN and self.turn is Turn.WALL:
+                if self.game_status == GameStatus.RUNNING:
+                    # print("wall")
+                    move = self.bot_cracker.get_move(self.board)
+                    # print(type(move))
+                    for obj in self.hex_objects.values():
+                        if obj.x == move[1] and obj.y == move[0]:
+                            self.place_wall(move[1], move[0], obj.obj_id)
+                            break
+                    self.turn = Turn.PENGUIN
+            elif self.allow_only is Turn.WALL and self.turn is Turn.PENGUIN:
+                if self.game_status == GameStatus.RUNNING:
+                    # print("penguin")
+                    move = self.bot_penguin.get_move(self.board)
+                    for obj in self.hex_objects.values():
+                        if obj.x == move[1] and obj.y == move[0]:
+                            self.move_penguin(move[1], move[0], obj.obj_id)
+                            break
+                    self.turn = Turn.WALL
+            self.counter = 0
 
         for hexagon in self.hex_objects.values():
             hex_origin = hexagon.points[0]
@@ -328,11 +360,18 @@ class Engine(Supervisor):
                     )
             elif (self.board[hexagon.y][hexagon.x] & Tile.ICE != 0 and
                   self.board[hexagon.y][hexagon.x] & Tile.FINISH == 0):
-                screen.blit(
-                    assets.textures['ICE'],
-                    (hex_origin[0] - self.hex_size / 2,
-                     hex_origin[1])
-                )
+                if self.board[hexagon.y][hexagon.x] & Tile.HIGHLIGHTED != 0:
+                    screen.blit(
+                        assets.textures['ICE_HIGHLIGHTED'],
+                        (hex_origin[0] - self.hex_size / 2,
+                        hex_origin[1])
+                    )
+                else:
+                    screen.blit(
+                        assets.textures['ICE'],
+                        (hex_origin[0] - self.hex_size / 2,
+                        hex_origin[1])
+                    )
             elif self.board[hexagon.y][hexagon.x] & Tile.FINISH != 0:
                 texture = snow_texture(self.board, hexagon.x, hexagon.y)
                 if texture is not None:
@@ -373,3 +412,5 @@ class Engine(Supervisor):
             else:
                 self.leave_button.texture_idx = 3
         self.leave_button.draw(screen)
+
+        self.counter += 1

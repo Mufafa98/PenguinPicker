@@ -10,6 +10,7 @@ from .hex_utils import create_board, center_board, snow_texture
 from .hexagon import Hexagon, Tile
 import socket
 import pygame
+import random
 from Utils import Message, Protocol
 from .game_type import GameType
 from .button import Button
@@ -271,6 +272,29 @@ class Menu(Supervisor):
                     )
                     self.socket.sendall(message.to_bytes())
                     self.waiting = True
+                elif self.game_type == GameType.LOCAL:
+                    global game_state
+                    game_state.running = True
+                    game_state.game_type = self.game_type
+                    game_state.engine_reset = True
+                    game_state.seed = random.randint(0, 1000000)
+                    if self.username.username == "penguin":
+                        game_state.game_turn = 0
+                        game_state.player_1 = self.username.username
+                        game_state.player_2 = "BOT"
+                    elif self.username.username == "cracker":
+                        game_state.game_turn = 1
+                        game_state.player_1 = "BOT"
+                        game_state.player_2 = self.username.username
+                    else:
+                        game_state.game_turn = random.randint(0, 1)
+                        if game_state.game_turn == 0:
+                            game_state.player_1 = self.username.username
+                            game_state.player_2 = "BOT"
+                        else:
+                            game_state.player_1 = "BOT"
+                            game_state.player_2 = self.username.username
+                    game_state.game_difficulty = self.diff_button.get_state()
 
             # If the online button is not selected, disable
             # the difficulty button, otherwise enable it

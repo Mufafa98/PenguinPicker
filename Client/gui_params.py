@@ -48,6 +48,7 @@ class GameState:
     - `seed`: The seed of the game. Needed for board generation.
     - `player_1`: The name of player 1.
     - `player_2`: The name of player 2.
+    - `game_difficulty`: The difficulty of the game. (Easy / Medium / Hard)
     """
     def __init__(self):
         """
@@ -62,6 +63,7 @@ class GameState:
         self.seed = None
         self.player_1 = None
         self.player_2 = None
+        self.game_difficulty = None
 
 
 game_state = GameState()

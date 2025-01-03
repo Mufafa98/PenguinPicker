@@ -35,12 +35,14 @@ class Tile:
     | ICE          | 0b0000010    |
     | CRACKED_ICE  | 0b0000100    |
     | FINISH       | 0b0001000    |
+    | HIGHLIGHTED  | 0b0010000    |
     """
     EMPTY = 0b0000000
     PENGUIN = 0b0000001
     ICE = 0b0000010
     CRACKED_ICE = 0b0000100
     FINISH = 0b0001000
+    HIGHLIGHTED = 0b0010000
 
 
 class Hexagon:
