@@ -2,7 +2,7 @@
 ### About
 - This file contains the main game engine for the Penguin game.
 - The engine is responsible for handling the game logic and rendering the game.
-- The engine is also responsible for handling the user input and sending the 
+- The engine is also responsible for handling the user input and sending the
 moves to the server.
 ### Classes
 - Engine: The main game engine class.
@@ -22,6 +22,7 @@ from .hex_utils import create_board, snow_texture, center_board, hole_texture
 from .text_field import TextField, TextAlign
 from .button import Button
 from .bot import difficulty, PenguinBot, CrackerBot
+
 
 class Turn:
     """
@@ -198,23 +199,23 @@ class Engine(Supervisor):
         obj_y = penguin_obj.y
         return (
             (
-                inside_board(obj_x - 2, obj_y) and
-                self.board[obj_y][obj_x - 2] & Tile.ICE != 0
+                inside_board(obj_x - 2, obj_y)
+                and self.board[obj_y][obj_x - 2] & Tile.ICE != 0
             ) or (
-                inside_board(obj_x + 2, obj_y) and
-                self.board[obj_y][obj_x + 2] & Tile.ICE != 0
+                inside_board(obj_x + 2, obj_y)
+                and self.board[obj_y][obj_x + 2] & Tile.ICE != 0
             ) or (
-                inside_board(obj_x - 1, obj_y - 1) and
-                self.board[obj_y - 1][obj_x - 1] & Tile.ICE != 0
+                inside_board(obj_x - 1, obj_y - 1)
+                and self.board[obj_y - 1][obj_x - 1] & Tile.ICE != 0
             ) or (
-                inside_board(obj_x + 1, obj_y - 1) and
-                self.board[obj_y - 1][obj_x + 1] & Tile.ICE != 0
+                inside_board(obj_x + 1, obj_y - 1)
+                and self.board[obj_y - 1][obj_x + 1] & Tile.ICE != 0
             ) or (
-                inside_board(obj_x - 1, obj_y + 1) and
-                self.board[obj_y + 1][obj_x - 1] & Tile.ICE != 0
+                inside_board(obj_x - 1, obj_y + 1)
+                and self.board[obj_y + 1][obj_x - 1] & Tile.ICE != 0
             ) or (
-                inside_board(obj_x + 1, obj_y + 1) and
-                self.board[obj_y + 1][obj_x + 1] & Tile.ICE != 0
+                inside_board(obj_x + 1, obj_y + 1)
+                and self.board[obj_y + 1][obj_x + 1] & Tile.ICE != 0
             )
         )
 
@@ -358,19 +359,23 @@ class Engine(Supervisor):
                         (hex_origin[0] - self.hex_size / 2,
                          hex_origin[1])
                     )
-            elif (self.board[hexagon.y][hexagon.x] & Tile.ICE != 0 and
-                  self.board[hexagon.y][hexagon.x] & Tile.FINISH == 0):
+            elif (self.board[hexagon.y][hexagon.x] & Tile.ICE != 0
+                  and self.board[hexagon.y][hexagon.x] & Tile.FINISH == 0):
                 if self.board[hexagon.y][hexagon.x] & Tile.HIGHLIGHTED != 0:
                     screen.blit(
                         assets.textures['ICE_HIGHLIGHTED'],
-                        (hex_origin[0] - self.hex_size / 2,
-                        hex_origin[1])
+                        (
+                            hex_origin[0] - self.hex_size / 2,
+                            hex_origin[1]
+                        )
                     )
                 else:
                     screen.blit(
                         assets.textures['ICE'],
-                        (hex_origin[0] - self.hex_size / 2,
-                        hex_origin[1])
+                        (
+                            hex_origin[0] - self.hex_size / 2,
+                            hex_origin[1]
+                        )
                     )
             elif self.board[hexagon.y][hexagon.x] & Tile.FINISH != 0:
                 texture = snow_texture(self.board, hexagon.x, hexagon.y)
@@ -395,8 +400,8 @@ class Engine(Supervisor):
         # Leave button animation
         if self.game_status == GameStatus.RUNNING:
             if (
-                index_buffer.buffer[mouse_pos[1]][mouse_pos[0]] ==
-                self.leave_button.button_id
+                index_buffer.buffer[mouse_pos[1]][mouse_pos[0]]
+                == self.leave_button.button_id
             ):
                 self.leave_button.texture_idx = 2
             else:

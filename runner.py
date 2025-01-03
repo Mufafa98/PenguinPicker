@@ -16,8 +16,8 @@ This is a simple runner script that helps running the server or the client
         -s --server: run the server
 ''')
 
+
 def count_lines(dir):
-    import os
     total_lines = 0
     for root, dirs, files in os.walk(dir):
         for file in files:
@@ -43,12 +43,16 @@ if __name__ == '__main__':
         import subprocess
         subprocess.run([
             sys.executable, '-m', 'flake8', '.', '--exclude', 'PPEnv',
-            '--ignore', 'F401, W504'
+            '--ignore', 'F401,W503,E125'
         ])
     elif arg == '--count':
         # Count the number of lines in the project
         import os
-        total_lines = count_lines('./Utils') + count_lines('./Server') + count_lines('./Client')
+        total_lines = (
+            count_lines('./Utils')
+            + count_lines('./Server')
+            + count_lines('./Client')
+        )
         print(f'Total lines of code: {total_lines}')
     else:
         print("Invalid argument provided. Use -h or --help for help")

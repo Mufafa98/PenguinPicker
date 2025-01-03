@@ -1,6 +1,6 @@
 """
 ### About
-This module contains the TextField class, which is used to display 
+This module contains the TextField class, which is used to display
 text on the screen, mainly for usernames.
 ### Classes
 - `TextField`: This class is used to display text on the screen.
@@ -71,8 +71,8 @@ class TextField:
             x = x - (3 + self.width // TILE_SIZE) * TILE_SIZE
 
         self.origin = (x, y)
-        self.x = (2 * x + 3 * TILE_SIZE + self.width) // 2 - self.width // 2
-        self.y = (2 * y + 3 * TILE_SIZE) // 2 - self.height
+        self.x = x + 3 * TILE_SIZE // 2
+        self.y = y + 3 * TILE_SIZE // 2 - self.height
 
         self.background = create_board(3, 3 + self.width // TILE_SIZE, 0)
         self.background_board = []

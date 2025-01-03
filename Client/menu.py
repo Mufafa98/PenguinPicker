@@ -143,7 +143,7 @@ class Menu(Supervisor):
     ### About
     - This class is responsable for the main menu of the game.
     ### Attributes
-    - `waiting`: A boolean flag that indicates if the game is waiting for 
+    - `waiting`: A boolean flag that indicates if the game is waiting for
     the server to start the game.
     - `socket`: The socket object used to communicate with the server.
     - `objects`: A dictionary containing the objects that need to be drawn.
@@ -229,7 +229,7 @@ class Menu(Supervisor):
         - `key`: The key code of the pressed key.
         """
         if not self.waiting:
-            if key == 8: 
+            if key == 8:
                 # Backspace
                 self.username.pop()
             if (key >= 97 and key <= 122) or (key >= 48 and key <= 57):
@@ -371,5 +371,3 @@ class Menu(Supervisor):
             except Exception as e:
                 print(e)
                 self.waiting = False
-
-    

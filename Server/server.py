@@ -28,7 +28,7 @@ MULTIPLAYER_LOCK = threading.Lock()
 
 def handle_client(client_socket: socket.socket):
     """
-    ### About 
+    ### About
     Function that has to handle the connection with a client.
 
     ### Parameters
@@ -49,6 +49,7 @@ def handle_client(client_socket: socket.socket):
         client_socket.send(message.to_bytes())
         # Recive a confirmation message and store the client id
         request = client_socket.recv(1024)
+        print(request)
         message = Message(Protocol.PONG, "Hello, Client!")
         client_socket.sendall(message.to_bytes())
         with CLIENT_LOCK:

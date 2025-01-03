@@ -1,8 +1,10 @@
 """
 ### About
-- This file contains the GameType class which is used to define the type of game.
+- This file contains the GameType class which
+is used to define the type of game.
 - Should be moved elsewhere in the future.
 """
+
 
 class GameType:
     """

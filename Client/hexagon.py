@@ -1,6 +1,6 @@
 """
 ### About
-This module contains the Hexagon class, 
+This module contains the Hexagon class,
 which is used to represent a hexagon on the game board.
 """
 
@@ -15,9 +15,10 @@ HEX_COORDS_COEF = [
     (0, 0.25),
 ]
 """
-Offsets from the origin(Top left corner) 
+Offsets from the origin(Top left corner)
 for each of the 6 points of the hexagon.
 """
+
 
 class Tile:
     """
@@ -133,9 +134,9 @@ class Hexagon:
             """
             return abs(
                 (
-                    A[0] * (B[1] - C[1]) +
-                    B[0] * (C[1] - A[1]) +
-                    C[0] * (A[1] - B[1])
+                    A[0] * (B[1] - C[1])
+                    + B[0] * (C[1] - A[1])
+                    + C[0] * (A[1] - B[1])
                 ) / 2.0
             )
         if y <= self.points[1][1]:

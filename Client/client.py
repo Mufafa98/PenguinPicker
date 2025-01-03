@@ -11,7 +11,8 @@ def run():
     - This function is the entry point for the client.
     - It connects to the server and starts the GUI.
     ### Exceptions
-    - KeyboardInterrupt: If the user presses `Ctrl+C`, the client will shut down.
+    - KeyboardInterrupt: If the user presses `Ctrl+C`, the client
+    will shut down.
     - Exception: If an error occurs, the client will print the error.
     """
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

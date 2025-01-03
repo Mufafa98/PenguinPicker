@@ -1,7 +1,7 @@
 """
 ### About
 - This module defines the communication protocol between the client and server.
-- It contains an enumeration of the available protocols 
+- It contains an enumeration of the available protocols
 and a class to encapsulate messages.
 """
 import enum
@@ -36,7 +36,8 @@ class Protocol(enum.Enum):
 class Message:
     """
     ### About
-    - This class is used to encapsulate data sent between the client and server.
+    - This class is used to encapsulate data sent between
+    the client and server.
     ### Methods
     - `to_bytes`: Converts the message to bytes.
     - `from_bytes`: Converts bytes to a message.
