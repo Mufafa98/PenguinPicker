@@ -43,10 +43,10 @@ def create_board(
         for col in range(cols * 2 - 1):
             if (line + col) % 2 == 1:
                 if (
-                    line == 0 or
-                    line == lines - 1 or
-                    col <= 1 or
-                    col >= cols * 2 - 3
+                    line == 0
+                    or line == lines - 1
+                    or col <= 1
+                    or col >= cols * 2 - 3
                 ):
                     # The board should be bordered by snow tiles
                     # (by FINISH tiles)
@@ -83,8 +83,8 @@ def center_board(board_size: tuple, hex_size: int) -> tuple:
     """
     board_width = board_size[0] * hex_size
     board_height = (
-        ((board_size[1] + 1) / 2) * hex_size +
-        board_size[1] / 2 * hex_size / 2)
+        ((board_size[1] + 1) / 2) * hex_size
+        + board_size[1] / 2 * hex_size / 2)
     return ((SCREEN_SIZE[0] - board_width) / 2,
             (SCREEN_SIZE[1] - board_height) / 2)
 

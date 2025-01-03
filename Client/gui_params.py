@@ -48,6 +48,7 @@ class GameState:
     - `seed`: The seed of the game. Needed for board generation.
     - `player_1`: The name of player 1.
     - `player_2`: The name of player 2.
+    - `game_difficulty`: The difficulty of the game. (Easy / Medium / Hard)
     """
     def __init__(self):
         """
@@ -62,6 +63,7 @@ class GameState:
         self.seed = None
         self.player_1 = None
         self.player_2 = None
+        self.game_difficulty = 0
 
 
 game_state = GameState()
@@ -130,7 +132,7 @@ def load_assets(hex_size: int):
     ### About
     - Loads the assets.
     ### Parameters
-    - `hex_size`: The size of a hex tile. 
+    - `hex_size`: The size of a hex tile.
     """
     global assets
     assets_dir = './assets/32x32'
@@ -163,8 +165,7 @@ class Supervisor:
         - `y`: The y coordinate of the click.
         - `obj_id`: The id of the object
         ### Exceptions
-        - `NotImplementedError`: If the method is not implemented by 
+        - `NotImplementedError`: If the method is not implemented by
         the subclass.
         """
         raise NotImplementedError("Method not implemented")
-

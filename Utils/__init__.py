@@ -3,7 +3,8 @@
 - This module defines basic utilities used by the client and server.
 ### Available Classes
 - `Protocol`: An enumeration of the available comunication protocols.
-- `Message`: A class used to encapsulate data sent between the client and server.
+- `Message`: A class used to encapsulate data sent between the client
+and server.
 ### Available Constants
 - `SERVER_IP`: The IP address of the server.
 - `SERVER_PORT`: The port used by the server.

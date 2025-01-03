@@ -17,7 +17,8 @@ class AlreadyRegisteredError(Exception):
 class ClickDispatcher:
     """
     ### About
-    - This class is responsible for dispatching clicks to the correct supervisor.
+    - This class is responsible for dispatching clicks to the correct
+    supervisor.
     ### Methods
     - `restart`: Resets the object mapping.
     - `register_object`: Registers an object with the dispatcher.

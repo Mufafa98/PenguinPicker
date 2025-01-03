@@ -47,7 +47,7 @@ def start_gui(client_socket: socket.socket):
             if event.type == pygame.KEYDOWN and not game_state.running:
                 key = event.key
                 menu.handle_key(key)
-        # When tranzitioning from menu to game or game to menu 
+        # When tranzitioning from menu to game or game to menu
         # we need to reset the engine respectively the menu
         # in order to avoid any ghost clicks trough the dispatcher
         if game_state.engine_reset:
@@ -80,7 +80,7 @@ def start_gui(client_socket: socket.socket):
         pygame.display.flip()
         clock.tick(FPS)
 
-    # When the client is done running, 
+    # When the client is done running,
     # notify the server and close the connection
     client_socket.sendall(Message(Protocol.EXIT, "").to_bytes())
     pygame.quit()
