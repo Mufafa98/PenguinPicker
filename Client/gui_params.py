@@ -139,14 +139,17 @@ def load_assets(hex_size: int):
     for subdir, _, files in os.walk(assets_dir):
         for file in files:
             if file.endswith('.png'):
-                texture = pygame.image.load(os.path.join(subdir, file))
+                # texture = pygame.image.load(os.path.join(subdir, file))
+                try:
+                    texture = pygame.image.load(os.path.join(subdir, file))
+                    # On certain systems, removing this line results in loosing
+                    # the alpha channel from assets
+                    texture.set_colorkey((0, 0, 0))
+                except pygame.error as e:
+                    print(e)
                 texture = pygame.transform.scale(texture, (hex_size, hex_size))
                 texture_name = os.path.splitext(file)[0].upper()
                 assets.textures[texture_name] = texture
-
-
-load_assets(TILE_SIZE)
-
 
 class Supervisor:
     """

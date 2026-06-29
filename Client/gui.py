@@ -3,7 +3,7 @@ import sys
 import socket
 from .penguin_engine import Engine
 from .menu import Menu
-from .gui_params import FPS, BACKGROUND_COLOR, game_state, SCREEN_SIZE
+from .gui_params import FPS, BACKGROUND_COLOR, TILE_SIZE, game_state, SCREEN_SIZE, load_assets
 from .click_dispatcher import ClickDispatcher
 from Utils.protocol import Protocol, Message
 
@@ -17,6 +17,9 @@ def start_gui(client_socket: socket.socket):
     - `client_socket`: The socket object used to communicate with the server.
     """
     global game_state, assets, SCREEN_SIZE, BACKGROUND_COLOR, FPS
+    pygame.init()
+    screen = pygame.display.set_mode(SCREEN_SIZE)
+    load_assets(TILE_SIZE)
 
     # Initialize a dispatcher to handle clicks
     dispatcher = ClickDispatcher()
@@ -27,11 +30,8 @@ def start_gui(client_socket: socket.socket):
     dispatcher.register_objects(menu.used_ids(), menu)
     engine = None
 
-    pygame.init()
 
-    screen = pygame.display.set_mode(SCREEN_SIZE)
     pygame.display.set_caption("Penguin Picker")
-
     # Set up a clock responsable for the FPS
     clock = pygame.time.Clock()
 
