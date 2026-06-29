@@ -1,10 +1,12 @@
+import logging
+
 import pygame
 import sys
 import socket
-from .penguin_engine import Engine
-from .menu import Menu
-from .gui_params import FPS, BACKGROUND_COLOR, TILE_SIZE, game_state, SCREEN_SIZE, load_assets
-from .click_dispatcher import ClickDispatcher
+from Client.penguin_engine import Engine
+from Client.menu import Menu
+from Client.gui_params import FPS, BACKGROUND_COLOR, TILE_SIZE, game_state, SCREEN_SIZE, load_assets
+from Client.click_dispatcher import ClickDispatcher
 from Utils.protocol import Protocol, Message
 
 
@@ -51,7 +53,7 @@ def start_gui(client_socket: socket.socket):
         # we need to reset the engine respectively the menu
         # in order to avoid any ghost clicks trough the dispatcher
         if game_state.engine_reset:
-            print("Resetting engine")
+            logging.info("Resetting engine")
             dispatcher.restart()
             engine = Engine(
                 game_state.game_type,
@@ -64,7 +66,7 @@ def start_gui(client_socket: socket.socket):
             dispatcher.register_objects(engine.used_ids(), engine)
             game_state.engine_reset = False
         if game_state.menu_reset:
-            print("Resetting menu")
+            logging.info("Resetting menu")
             dispatcher.restart()
             menu = Menu(client_socket)
             dispatcher.register_objects(menu.used_ids(), menu)

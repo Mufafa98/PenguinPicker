@@ -10,9 +10,10 @@ the board should be placed to be centered on the screen.
 """
 
 import random
+import logging
 import pygame
-from .hexagon import Tile
-from .gui_params import SCREEN_SIZE, assets
+from Client.hexagon import Tile
+from Client.gui_params import SCREEN_SIZE, assets
 
 
 def create_board(
@@ -113,6 +114,8 @@ def snow_texture(board: list, x: int, y: int) -> pygame.Surface:
             return board[y][x]
         except IndexError:
             return Tile.EMPTY
+        except Exception as e:
+            logging.error(e)
     neighbors = [
         get_board_tile(board, x - 1, y - 1),
         get_board_tile(board, x + 1, y - 1),

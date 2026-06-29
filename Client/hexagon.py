@@ -4,7 +4,7 @@ This module contains the Hexagon class,
 which is used to represent a hexagon on the game board.
 """
 
-from .gui_params import SCREEN_SIZE, index_buffer
+from Client.gui_params import SCREEN_SIZE, index_buffer
 
 HEX_COORDS_COEF = [
     (0.5, 0.0),

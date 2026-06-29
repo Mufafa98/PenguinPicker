@@ -4,16 +4,18 @@
 for the main menu of the game.
 """
 
-from .gui_params import Supervisor, TILE_SIZE
-from .gui_params import index_buffer, assets, game_state
-from .hex_utils import create_board, center_board, snow_texture
-from .hexagon import Hexagon, Tile
+import logging
+
+from Client.gui_params import Supervisor, TILE_SIZE
+from Client.gui_params import index_buffer, assets, game_state
+from Client.hex_utils import create_board, center_board, snow_texture
+from Client.hexagon import Hexagon, Tile
 import socket
 import pygame
 import random
 from Utils import Message, Protocol
-from .game_type import GameType
-from .button import Button
+from Client.game_type import GameType
+from Client.ui_components.button import Button
 
 
 class Username:
@@ -350,9 +352,9 @@ class Menu(Supervisor):
                 data = self.socket.recv(1024, socket.MSG_DONTWAIT)
                 if data:
                     message = Message.from_bytes(data)
-                    print(f"Message: {message}")
+                    logging.info(f"Message: {message}")
                     if message.protocol == Protocol.START:
-                        print("Starting game")
+                        logging.info("Starting game")
                         global game_state
                         game_state.running = True
                         game_state.game_type = self.game_type
@@ -369,5 +371,5 @@ class Menu(Supervisor):
             except BlockingIOError:
                 pass
             except Exception as e:
-                print(e)
+                logging.error(e)
                 self.waiting = False

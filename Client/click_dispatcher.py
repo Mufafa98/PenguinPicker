@@ -2,7 +2,9 @@
 ### About
 - This class is responsible for dispatching clicks to the correct supervisor.
 """
-from .gui_params import index_buffer, Supervisor
+import logging
+
+from Client.gui_params import index_buffer, Supervisor
 
 
 class AlreadyRegisteredError(Exception):
@@ -93,6 +95,6 @@ class ClickDispatcher:
         global index_buffer
         obj_id = index_buffer.buffer[y][x]
         if type(obj_id) is not int:
-            print(f"No object found at ({x}, {y})")
+            logging.error(f"No object found at ({x}, {y})")
         elif obj_id in self.object_mapping:
             self.object_mapping[obj_id].handle_click(x, y, obj_id)

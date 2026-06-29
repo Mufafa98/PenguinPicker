@@ -20,6 +20,8 @@
 - `Supervisor`: An abstract class for the supervisors.
     - `handle_click`: An abstract method to handle a click.
 """
+import logging
+
 import pygame
 import os
 
@@ -145,8 +147,8 @@ def load_assets(hex_size: int):
                     # On certain systems, removing this line results in loosing
                     # the alpha channel from assets
                     texture.set_colorkey((0, 0, 0))
-                except pygame.error as e:
-                    print(e)
+                except Exception as e:
+                    logging.error(e)
                 texture = pygame.transform.scale(texture, (hex_size, hex_size))
                 texture_name = os.path.splitext(file)[0].upper()
                 assets.textures[texture_name] = texture
