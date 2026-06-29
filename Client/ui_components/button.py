@@ -2,9 +2,9 @@
 ### About
 - This module defines a button class that is used to create buttons in the GUI.
 """
-from .hex_utils import create_board, snow_texture
-from .hexagon import Hexagon, Tile
-from .gui_params import TILE_SIZE, index_buffer
+from Client.hex_utils import create_board, snow_texture
+from Client.hexagon import Hexagon, Tile
+from Client.gui_params import TILE_SIZE, index_buffer
 import pygame
 
 
@@ -41,11 +41,10 @@ class Button:
         for y, row in enumerate(self.board):
             for x, tile in enumerate(row):
                 if tile & Tile.ICE != 0:
-                    self.objects[index_buffer.object_id] = Hexagon(
-                        pos, x, y,
-                        TILE_SIZE, index_buffer.object_id)
+                    obj_id = index_buffer.object_id
+                    self.objects[obj_id] = Hexagon(pos, x, y, TILE_SIZE, obj_id)
                     if x == 2 and y == 1:
-                        self.button_id = index_buffer.object_id
+                        self.button_id = obj_id
                     index_buffer.object_id += 1
         self.texture_idx = 0
         self.textures = textures

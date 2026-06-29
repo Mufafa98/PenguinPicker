@@ -10,18 +10,23 @@ moves to the server.
 - GameStatus: Enum class for the game status.
 """
 
+import logging
+from venv import logger
+
 import pygame
 import socket
 from Utils.protocol import Protocol, Message
 
-from .gui_params import Supervisor, index_buffer, assets, game_state
-from .gui_params import SCREEN_SIZE, TILE_SIZE
-from .game_type import GameType
-from .hexagon import Hexagon, Tile
-from .hex_utils import create_board, snow_texture, center_board, hole_texture
-from .text_field import TextField, TextAlign
-from .button import Button
-from .bot import difficulty, PenguinBot, CrackerBot
+from Client.gui_params import Supervisor, index_buffer, assets, game_state
+from Client.gui_params import SCREEN_SIZE, TILE_SIZE
+from Client.game_type import GameType
+from Client.hexagon import Hexagon, Tile
+from Client.hex_utils import create_board, snow_texture, center_board, hole_texture
+from Client.ui_components.text_field import TextField, TextAlign
+from Client.ui_components.button import Button
+from Client.bot.utils import difficulty 
+from Client.bot.penguin_bot import PenguinBot
+from Client.bot.cracker_bot import CrackerBot
 
 
 class Turn:
@@ -174,12 +179,12 @@ class Engine(Supervisor):
                                 message = Message(Protocol.WALL, f"{x} {y}")
                                 self.socket.sendall(message.to_bytes())
         elif obj_id == self.leave_button.button_id:
-            print("Leave button clicked")
+            logging.info("Leave button clicked")
             game_state.running = False
             game_state.menu_reset = True
             index_buffer.restart_buffer()
         else:
-            print(f"Invalid click: Game Finished: {self.game_status}")
+            logging.error(f"Invalid click: Game Finished: {self.game_status}")
 
     def legal_for_penguin(self) -> bool:
         """
@@ -326,13 +331,12 @@ class Engine(Supervisor):
                         self.place_wall(x, y, index_buffer.buffer[y][x])
             except BlockingIOError:
                 pass
+            except Exception as e:
+                logging.error(e)
         elif self.counter % 20 == 0:
-            # print(1)
             if self.allow_only is Turn.PENGUIN and self.turn is Turn.WALL:
                 if self.game_status == GameStatus.RUNNING:
-                    # print("wall")
                     move = self.bot_cracker.get_move(self.board)
-                    # print(type(move))
                     for obj in self.hex_objects.values():
                         if obj.x == move[1] and obj.y == move[0]:
                             self.place_wall(move[1], move[0], obj.obj_id)
@@ -340,7 +344,6 @@ class Engine(Supervisor):
                     self.turn = Turn.PENGUIN
             elif self.allow_only is Turn.WALL and self.turn is Turn.PENGUIN:
                 if self.game_status == GameStatus.RUNNING:
-                    # print("penguin")
                     move = self.bot_penguin.get_move(self.board)
                     for obj in self.hex_objects.values():
                         if obj.x == move[1] and obj.y == move[0]:

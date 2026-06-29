@@ -2,13 +2,8 @@ import Server
 import Client
 import sys
 
-
-from colortag import c
-
-HELP_MESSAGE = c('''
-<About: blue;bold>
+HELP_MESSAGE = ('''
 This is a simple runner script that helps running the server or the client
-<Usage: blue;bold>
     python runner.py [APPLICATION]
 
     [APPLICATION]:

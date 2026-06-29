@@ -6,4 +6,4 @@
 - `run()`: Starts the client.
 """
 
-from .client import run
+from Client.client import run

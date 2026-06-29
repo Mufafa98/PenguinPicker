@@ -7,8 +7,8 @@ text on the screen, mainly for usernames.
 - `TextAlign`: This class is used to align the text in the TextField.
 """
 
-from .penguin_engine import Hexagon, create_board, Tile, snow_texture
-from .gui_params import TILE_SIZE, index_buffer, assets
+from Client.penguin_engine import Hexagon, create_board, Tile, snow_texture
+from Client.gui_params import TILE_SIZE, index_buffer, assets
 import pygame
 
 
@@ -77,7 +77,7 @@ class TextField:
         self.background = create_board(3, 3 + self.width // TILE_SIZE, 0)
         self.background_board = []
         for y_, row in enumerate(self.background):
-            for x_, tile in enumerate(row):
+            for x_, _ in enumerate(row):
                 self.background_board.append(
                     Hexagon(
                         self.origin, x_, y_,
