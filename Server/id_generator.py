@@ -4,7 +4,7 @@ import threading
 ID_LOCK = threading.Lock()
 
 
-class IdTool:
+class IdGenerator:
     """
     ### About
     - This class is responsible for generating unique ids for each client.
