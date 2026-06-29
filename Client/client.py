@@ -2,6 +2,15 @@ import socket
 from colortag import cprint
 from Utils import Message, Protocol, SERVER_IP, SERVER_PORT
 
+import os
+import warnings
+
+# Hide "Hello from the pygame community"
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+
+# Hide the AVX2 RuntimeWarning
+warnings.filterwarnings("ignore", message=".*avx2 capable.*")
+
 from .gui import start_gui
 
 
