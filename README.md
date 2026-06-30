@@ -75,31 +75,33 @@ It is recommended to use  **Python 3.8+** and run the folowing command to instal
 dependencies:
 
 ```bash
-    pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ## How to run
 
 1. Clone the repository:
 ```bash
-    git clone https://github.com/Mufafa98/PenguinPicker.git
-    cd PenguinPicker
+git clone https://github.com/Mufafa98/PenguinPicker.git
+cd PenguinPicker
 ```
 2. Start the server (for online mode only)
 
 ```bash
-    python runner.py -s
+python runner.py -s
 ```
 
 3. Start the client
 
 ```bash
-    python runner.py -c
+python runner.py -c
 ```
 
 - If you chose Local mode, the game starts immediately.
 - If you chose Online mode, the client waits for another player to join, and plays
 a cute animation.
+
+> Note that for now, the client cannot be started if the server is not running
 
 ## How to play 
 
